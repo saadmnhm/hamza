@@ -39,7 +39,10 @@
             "autoload": {
                 "psr-4": {
                     "BaconQrCode\\": "src/"
-                }
+                },
+                "files": [
+                    "app/helpers.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [

@@ -1,4 +1,4 @@
-<div class=" p-6 md:p-8 space-y-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm">
+<div class="p-6 md:p-8 space-y-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm">
     <!-- En-tête -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6">
         <div>
@@ -6,11 +6,17 @@
             <flux:subheading class="mt-1">Définissez les niveaux d'accès et contrôlez les autorisations attribuées à votre équipe.</flux:subheading>
         </div>
         <div class="flex items-center gap-3">
-            <flux:modal.trigger name="role-modal">
-                <flux:button variant="primary" icon="plus" wire:click="createRole">Nouveau rôle</flux:button>
-            </flux:modal.trigger>
+            <flux:button variant="primary" icon="plus" wire:click="createRole">Nouveau rôle</flux:button>
         </div>
     </div>
+
+    @if (session('status'))
+        <flux:callout variant="success" icon="check-circle" text="{{ session('status') }}" />
+    @endif
+
+    @if (session('error'))
+        <flux:callout variant="danger" icon="exclamation-circle" text="{{ session('error') }}" />
+    @endif
 
     <!-- Barre de recherche -->
     <div class="flex justify-between items-center">
@@ -22,7 +28,7 @@
     <!-- Tableau des Rôles -->
     <flux:table>
         <flux:table.columns>
-            <flux:table.column sortable>Nom du Rôle</flux:table.column>
+            <flux:table.column>Nom du Rôle</flux:table.column>
             <flux:table.column>Description</flux:table.column>
             <flux:table.column>Utilisateurs</flux:table.column>
             <flux:table.column>Permissions</flux:table.column>
@@ -30,114 +36,77 @@
         </flux:table.columns>
 
         <flux:table.rows>
-            <!-- Rôle 1: Administrateur -->
-            <flux:table.row>
-                <flux:table.cell>
-                    <div class="flex items-center gap-2">
-                        <flux:icon name="shield-check" class="size-4 text-purple-600 dark:text-purple-400" />
-                        <span class="font-semibold text-zinc-900 dark:text-zinc-100">Administrateur</span>
-                        <flux:badge color="purple" size="sm" class="ml-1">Système</flux:badge>
-                    </div>
-                </flux:table.cell>
-                <flux:table.cell class="text-zinc-500 text-sm">Accès total et illimité à toutes les fonctionnalités et configurations.</flux:table.cell>
-                <flux:table.cell>
-                    <div class="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-300">
-                        <flux:icon name="users" class="size-4 text-zinc-400" />
-                        <span>2 membres</span>
-                    </div>
-                </flux:table.cell>
-                <flux:table.cell>
-                    <flux:badge color="emerald" size="sm">Toutes les permissions (Accès Total)</flux:badge>
-                </flux:table.cell>
-                <flux:table.cell align="end">
-                    <flux:dropdown>
-                        <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
-                        <flux:menu>
-                            <flux:modal.trigger name="role-modal">
-                                <flux:menu.item icon="pencil-square" wire:click="editRole(1)">Modifier</flux:menu.item>
-                            </flux:modal.trigger>
-                            <flux:menu.item icon="document-duplicate" wire:click="duplicateRole(1)">Dupliquer</flux:menu.item>
-                        </flux:menu>
-                    </flux:dropdown>
-                </flux:table.cell>
-            </flux:table.row>
+            @forelse ($roles as $role)
+                <flux:table.row wire:key="role-{{ $role->id }}">
+                    <flux:table.cell>
+                        <div class="flex items-center gap-2">
+                            <flux:icon :name="$role->icon()" class="size-4 text-zinc-500 dark:text-zinc-400" />
+                            <span class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $role->name }}</span>
+                            @if ($role->is_system)
+                                <flux:badge color="purple" size="sm" class="ml-1">Système</flux:badge>
+                            @endif
+                        </div>
+                    </flux:table.cell>
 
-            <!-- Rôle 2: Manager -->
-            <flux:table.row>
-                <flux:table.cell>
-                    <div class="flex items-center gap-2">
-                        <flux:icon name="user-group" class="size-4 text-blue-600 dark:text-blue-400" />
-                        <span class="font-semibold text-zinc-900 dark:text-zinc-100">Manager Ops</span>
-                    </div>
-                </flux:table.cell>
-                <flux:table.cell class="text-zinc-500 text-sm">Gestion des équipes, validation des factures et suivi d'activité.</flux:table.cell>
-                <flux:table.cell>
-                    <div class="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-300">
-                        <flux:icon name="users" class="size-4 text-zinc-400" />
-                        <span>5 membres</span>
-                    </div>
-                </flux:table.cell>
-                <flux:table.cell>
-                    <flux:badge color="zinc" size="sm">14 permissions</flux:badge>
-                </flux:table.cell>
-                <flux:table.cell align="end">
-                    <flux:dropdown>
-                        <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
-                        <flux:menu>
-                            <flux:modal.trigger name="role-modal">
-                                <flux:menu.item icon="pencil-square" wire:click="editRole(2)">Modifier</flux:menu.item>
-                            </flux:modal.trigger>
-                            <flux:menu.item icon="document-duplicate" wire:click="duplicateRole(2)">Dupliquer</flux:menu.item>
-                            <flux:menu.separator />
-                            <flux:modal.trigger name="delete-role-modal">
-                                <flux:menu.item icon="trash" variant="danger" wire:click="confirmDelete(2)">Supprimer</flux:menu.item>
-                            </flux:modal.trigger>
-                        </flux:menu>
-                    </flux:dropdown>
-                </flux:table.cell>
-            </flux:table.row>
+                    <flux:table.cell class="text-zinc-500 text-sm">
+                        {{ $role->description ?: 'Aucune description' }}
+                    </flux:table.cell>
 
-            <!-- Rôle 3: Comptable -->
-            <flux:table.row>
-                <flux:table.cell>
-                    <div class="flex items-center gap-2">
-                        <flux:icon name="banknotes" class="size-4 text-emerald-600 dark:text-emerald-400" />
-                        <span class="font-semibold text-zinc-900 dark:text-zinc-100">Comptable</span>
-                    </div>
-                </flux:table.cell>
-                <flux:table.cell class="text-zinc-500 text-sm">Gestion de la facturation, accès aux identifiants fiscaux (ICE, CNSS, IF).</flux:table.cell>
-                <flux:table.cell>
-                    <div class="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-300">
-                        <flux:icon name="users" class="size-4 text-zinc-400" />
-                        <span>3 membres</span>
-                    </div>
-                </flux:table.cell>
-                <flux:table.cell>
-                    <flux:badge color="zinc" size="sm">8 permissions</flux:badge>
-                </flux:table.cell>
-                <flux:table.cell align="end">
-                    <flux:dropdown>
-                        <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
-                        <flux:menu>
-                            <flux:modal.trigger name="role-modal">
-                                <flux:menu.item icon="pencil-square" wire:click="editRole(3)">Modifier</flux:menu.item>
-                            </flux:modal.trigger>
-                            <flux:menu.item icon="document-duplicate" wire:click="duplicateRole(3)">Dupliquer</flux:menu.item>
-                            <flux:menu.separator />
-                            <flux:modal.trigger name="delete-role-modal">
-                                <flux:menu.item icon="trash" variant="danger" wire:click="confirmDelete(3)">Supprimer</flux:menu.item>
-                            </flux:modal.trigger>
-                        </flux:menu>
-                    </flux:dropdown>
-                </flux:table.cell>
-            </flux:table.row>
+                    <flux:table.cell>
+                        <div class="flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-300">
+                            <flux:icon name="users" class="size-4 text-zinc-400" />
+                            <span>{{ $role->users_count }} membre(s)</span>
+                        </div>
+                    </flux:table.cell>
+
+                    <flux:table.cell>
+                        @if ($role->is_system)
+                            <flux:badge color="emerald" size="sm">Toutes les permissions (Accès Total)</flux:badge>
+                        @elseif ($role->permissionCount() > 0)
+                            <flux:badge color="zinc" size="sm">{{ $role->permissionCount() }} permission(s)</flux:badge>
+                        @else
+                            <flux:badge color="zinc" size="sm">Aucune permission</flux:badge>
+                        @endif
+                    </flux:table.cell>
+
+                    <flux:table.cell align="end">
+                        <flux:dropdown>
+                            <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
+                            <flux:menu>
+                                <flux:menu.item icon="pencil-square" wire:click="editRole({{ $role->id }})">
+                                    Modifier
+                                </flux:menu.item>
+                                <flux:menu.item icon="document-duplicate" wire:click="duplicateRole({{ $role->id }})">
+                                    Dupliquer
+                                </flux:menu.item>
+
+                                @unless ($role->is_system)
+                                    <flux:menu.separator />
+                                    <flux:menu.item icon="trash" variant="danger" wire:click="confirmDelete({{ $role->id }})">
+                                        Supprimer
+                                    </flux:menu.item>
+                                @endunless
+                            </flux:menu>
+                        </flux:dropdown>
+                    </flux:table.cell>
+                </flux:table.row>
+            @empty
+                <flux:table.row>
+                    <flux:table.cell colspan="5">
+                        <div class="flex flex-col items-center justify-center gap-2 py-10 text-center">
+                            <flux:icon name="shield-check" class="size-8 text-zinc-300 dark:text-zinc-600" />
+                            <flux:text size="sm">Aucun rôle ne correspond à cette recherche.</flux:text>
+                        </div>
+                    </flux:table.cell>
+                </flux:table.row>
+            @endforelse
         </flux:table.rows>
     </flux:table>
 
     <!-- MODAL CRUD (Création & Édition d'un rôle) -->
     <flux:modal name="role-modal" class="md:w-200 space-y-6">
         <div>
-            <flux:heading size="lg">Configuration du Rôle</flux:heading>
+            <flux:heading size="lg">{{ $editingRoleId ? 'Modifier le rôle' : 'Créer un rôle' }}</flux:heading>
             <flux:subheading class="mt-1">Nommez le rôle et cochez les permissions accordées à ce profil.</flux:subheading>
         </div>
 
@@ -163,57 +132,43 @@
             <div class="space-y-4">
                 <flux:heading level="3" size="base">Permissions d'accès</flux:heading>
 
+                @if ($editingRoleId && $roles->firstWhere('id', $editingRoleId)?->is_system)
+                    <flux:callout variant="secondary" icon="lock-closed" text="Le rôle Administrateur est un rôle système : il conserve automatiquement toutes les permissions." />
+                @endif
+
                 <div class="space-y-6">
-                    <!-- Module 1: Configuration Entreprise -->
-                    <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 space-y-3">
-                        <div class="font-medium text-sm text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
-                            <span class="flex items-center gap-2">
-                                <flux:icon name="building-office" class="size-4 text-zinc-500" />
-                                Configuration & Infos Légales
-                            </span>
-                            <flux:button size="xs" variant="subtle">Tout cocher</flux:button>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            <flux:checkbox wire:model="permissions.company_view" label="Consulter la fiche entreprise" />
-                            <flux:checkbox wire:model="permissions.company_edit" label="Modifier le logo & coordonnées" />
-                            <flux:checkbox wire:model="permissions.fiscal_edit" label="Gérer les identifiants fiscaux (ICE, CNSS, IF)" />
-                        </div>
-                    </div>
+                    @foreach ($permissionGroups as $groupKey => $group)
+                        <div wire:key="permission-group-{{ $groupKey }}" class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 space-y-3">
+                            <div class="font-medium text-sm text-zinc-900 dark:text-zinc-100 flex flex-wrap items-center justify-between gap-2">
+                                <span class="flex items-center gap-2">
+                                    <flux:icon :name="$group['icon']" class="size-4 text-zinc-500" />
+                                    {{ $group['label'] }}
+                                </span>
 
-                    <!-- Module 2: Utilisateurs & Équipe -->
-                    <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 space-y-3">
-                        <div class="font-medium text-sm text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
-                            <span class="flex items-center gap-2">
-                                <flux:icon name="users" class="size-4 text-zinc-500" />
-                                Gestion des Utilisateurs
-                            </span>
-                            <flux:button size="xs" variant="subtle">Tout cocher</flux:button>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            <flux:checkbox wire:model="permissions.users_view" label="Voir la liste des utilisateurs" />
-                            <flux:checkbox wire:model="permissions.users_invite" label="Inviter de nouveaux membres" />
-                            <flux:checkbox wire:model="permissions.users_edit" label="Modifier les profils utilisateurs" />
-                            <flux:checkbox wire:model="permissions.roles_manage" label="Gérer les rôles et permissions" />
-                        </div>
-                    </div>
+                                <span class="flex items-center gap-1">
+                                    <flux:button size="xs" variant="subtle" type="button" wire:click="selectAllPermissions('{{ $groupKey }}')">
+                                        Tout cocher
+                                    </flux:button>
+                                    <flux:button size="xs" variant="subtle" type="button" wire:click="clearAllPermissions('{{ $groupKey }}')">
+                                        Tout décocher
+                                    </flux:button>
+                                </span>
+                            </div>
 
-                    <!-- Module 3: Facturation & Compta -->
-                    <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 space-y-3">
-                        <div class="font-medium text-sm text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
-                            <span class="flex items-center gap-2">
-                                <flux:icon name="document-text" class="size-4 text-zinc-500" />
-                                Facturation & Financement
-                            </span>
-                            <flux:button size="xs" variant="subtle">Tout cocher</flux:button>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                @foreach ($group['permissions'] as $permissionKey => $permissionLabel)
+                                    <flux:checkbox
+                                        wire:model="permissions.{{ $permissionKey }}"
+                                        label="{{ $permissionLabel }}"
+                                        wire:key="permission-{{ $permissionKey }}"
+                                    />
+                                @endforeach
+                            </div>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            <flux:checkbox wire:model="permissions.invoices_view" label="Consulter les factures et devis" />
-                            <flux:checkbox wire:model="permissions.invoices_create" label="Créer et émettre des factures" />
-                            <flux:checkbox wire:model="permissions.invoices_delete" label="Supprimer/Annuler des documents" />
-                            <flux:checkbox wire:model="permissions.reports_export" label="Exporter les états comptables" />
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
+
+                <flux:error name="permissions" />
             </div>
 
             <!-- Actions Pied de page -->
@@ -235,6 +190,8 @@
             <flux:heading size="lg">Supprimer ce rôle ?</flux:heading>
             <flux:subheading>Cette action est irréversible. Si des utilisateurs sont associés à ce rôle, vous devrez d'abord leur réattribuer un autre rôle.</flux:subheading>
         </div>
+
+        <flux:error name="delete" />
 
         <div class="flex justify-center gap-3 pt-2">
             <flux:modal.close>

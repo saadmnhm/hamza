@@ -17,16 +17,31 @@
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
+            
+            @if (auth()->user()?->hasPermission('documents_view'))
+                <flux:sidebar.group expandable heading="{{ __('Documents ') }}" class="grid">
+                    <flux:sidebar.item :href="route('documents')" :current="request()->routeIs('documents')">{{ __('Génération de documents') }}</flux:sidebar.item>
+                </flux:sidebar.group>
+            @endif
 
-            <flux:sidebar.group expandable heading="{{ __('Utilisateur ') }}" class="grid">
-                <flux:sidebar.item :href="route('users')" :current="request()->routeIs('users')">{{ __('Admin ') }}</flux:sidebar.item>
-                <flux:sidebar.item :href="route('roleslist')" :current="request()->routeIs('roleslist')">{{ __('Roles ') }}</flux:sidebar.item>
+            @if (auth()->user()?->hasPermission('users_view') || auth()->user()?->hasPermission('roles_manage'))
+                <flux:sidebar.group expandable heading="{{ __('Utilisateur ') }}" class="grid">
+                    @if (auth()->user()?->hasPermission('users_view'))
+                        <flux:sidebar.item :href="route('users')" :current="request()->routeIs('users')">{{ __('Admin ') }}</flux:sidebar.item>
+                    @endif
+                    @if (auth()->user()?->hasPermission('roles_manage'))
+                        <flux:sidebar.item :href="route('roleslist')" :current="request()->routeIs('roleslist')">{{ __('Roles ') }}</flux:sidebar.item>
+                    @endif
+                </flux:sidebar.group>
+            @endif
 
-            </flux:sidebar.group>
+            @if (auth()->user()?->hasPermission('company_view'))
+                <flux:sidebar.group expandable heading="{{ __('Entreprise ') }}" class="grid">
+                    <flux:sidebar.item :href="route('config')" :current="request()->routeIs('config')">{{ __('Configuration ') }}</flux:sidebar.item>
+                </flux:sidebar.group>
+            @endif
 
-            <flux:sidebar.group expandable heading="{{ __('Entreprise ') }}" class="grid">
-                <flux:sidebar.item :href="route('config')" :current="request()->routeIs('config')">{{ __('Configuration ') }}</flux:sidebar.item>
-            </flux:sidebar.group>
+
 
             <flux:spacer />
 

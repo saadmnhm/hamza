@@ -5,10 +5,6 @@
             <flux:heading size="xl" level="1">Configuration de l'Entreprise</flux:heading>
             <flux:subheading class="mt-1">Gérez les informations légales, l'identité visuelle et les identifiants fiscaux de votre société.</flux:subheading>
         </div>
-        <div class="flex items-center gap-3">
-            <flux:button variant="ghost">Annuler</flux:button>
-            <flux:button variant="primary" icon="check">Enregistrer</flux:button>
-        </div>
     </div>
 
     <form wire:submit="save" class="space-y-8">
@@ -161,7 +157,8 @@
         <!-- Actions Pied de Page -->
         <div class="flex items-center justify-end gap-3 pt-6 border-t border-zinc-200 dark:border-zinc-800">
             <flux:button variant="ghost">Annuler</flux:button>
-            <flux:button type="submit" variant="primary" icon="check">Enregistrer les modifications</flux:button>
-        </div>
+<flux:button type="submit" variant="primary" icon="check" wire:target="save" wire:loading.attr="disabled">
+    Enregistrer les modifications
+</flux:button>        </div>
     </form>
 </div>
