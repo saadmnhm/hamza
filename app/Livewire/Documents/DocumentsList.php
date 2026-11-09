@@ -2,30 +2,60 @@
 
 namespace App\Livewire\Documents;
 
+use App\Models\DocumentHistory;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
+#[Title('Documents')]
 class DocumentsList extends Component
 {
-    public $selectedDocument = null;
+    use WithPagination;
 
-    public $showModal = false;
+    public string $search = '';
 
-    public function openModal(string $documentType): void
+    public string $typeFilter = '';
+
+    public function mount(): void
     {
-        $this->selectedDocument = DocumentType::tryFrom($documentType);
-        $this->showModal = true;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        abort_unless($user?->hasPermission('documents_view'), 403);
     }
 
-    public function closeModal(): void
+    public function updatedSearch(): void
     {
-        $this->selectedDocument = null;
-        $this->showModal = false;
+        $this->resetPage();
     }
 
-    public function render()
+    public function updatedTypeFilter(): void
     {
+        $this->resetPage();
+    }
+
+    public function render(): View
+    {
+        $histories = DocumentHistory::query()
+            ->with(['client', 'invoice'])
+            ->when($this->typeFilter !== '', fn ($query) => $query->where('document_type', $this->typeFilter))
+            ->when($this->search !== '', function ($query): void {
+                $search = '%'.$this->search.'%';
+
+                $query->where(function ($query) use ($search): void {
+                    $query->where('title', 'like', $search)
+                        ->orWhere('document_type', 'like', $search);
+                });
+            })
+            ->latest()
+            ->paginate(10);
+
         return view('livewire.documents.list', [
             'documentTypes' => DocumentType::cases(),
+            'generationTypes' => [DocumentType::EMPLOYMENT_CONTRACT, DocumentType::SALARY_SLIP],
+            'histories' => $histories,
         ]);
     }
 }

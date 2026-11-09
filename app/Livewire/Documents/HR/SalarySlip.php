@@ -3,7 +3,9 @@
 namespace App\Livewire\Documents\HR;
 
 use App\Livewire\Documents\DocumentType;
+use App\Models\Client;
 use App\Models\Config;
+use App\Models\Demande;
 use App\Models\DocumentHistory;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
@@ -52,7 +54,15 @@ class SalarySlip extends Component
         abort_unless($user?->hasPermission('documents_view'), 403);
 
         $this->config = Config::first();
+
+        $clientId = request()->integer('client');
+
+        if ($clientId > 0 && Client::query()->whereKey($clientId)->exists()) {
+            $this->clientId = $clientId;
+        }
     }
+
+    public ?int $clientId = null;
 
     public $generatedHtml = null;
 
@@ -67,8 +77,19 @@ class SalarySlip extends Component
         $html = $this->renderDocument($validated);
 
         // Save to history
+        $demandeId = null;
+
+        if ($this->clientId !== null) {
+            $demandeId = Demande::query()->create([
+                'client_id' => $this->clientId,
+                'date' => now()->toDateString(),
+            ])->id;
+        }
+
         $history = DocumentHistory::create([
             'user_id' => auth()->id(),
+            'client_id' => $this->clientId,
+            'demande_id' => $demandeId,
             'document_type' => DocumentType::SALARY_SLIP->value,
             'title' => DocumentType::SALARY_SLIP->title(),
             'data' => $validated,
@@ -107,6 +128,8 @@ class SalarySlip extends Component
         // Save new history entry
         $newHistory = DocumentHistory::create([
             'user_id' => auth()->id(),
+            'client_id' => $history->client_id,
+            'demande_id' => $history->demande_id,
             'document_type' => DocumentType::SALARY_SLIP->value,
             'title' => DocumentType::SALARY_SLIP->title(),
             'data' => $history->data,

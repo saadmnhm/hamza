@@ -34,6 +34,28 @@ return [
             ],
         ],
 
+        'clients' => [
+            'label' => 'Gestion des Clients',
+            'icon' => 'user-group',
+            'permissions' => [
+                'clients_view' => 'Consulter la liste des clients',
+                'clients_create' => 'Créer de nouveaux clients',
+                'clients_edit' => 'Modifier les fiches clients',
+                'clients_delete' => 'Supprimer des clients',
+            ],
+        ],
+
+        'items' => [
+            'label' => 'Catalogue des Articles',
+            'icon' => 'cube',
+            'permissions' => [
+                'items_view' => 'Consulter le catalogue des articles',
+                'items_create' => 'Créer des articles',
+                'items_edit' => 'Modifier des articles',
+                'items_delete' => 'Supprimer des articles',
+            ],
+        ],
+
         'billing' => [
             'label' => 'Facturation & Financement',
             'icon' => 'document-text',
@@ -108,6 +130,12 @@ return [
                 'users_view',
                 'users_invite',
                 'users_edit',
+                'clients_view',
+                'clients_create',
+                'clients_edit',
+                'items_view',
+                'items_create',
+                'items_edit',
                 'invoices_view',
                 'invoices_create',
                 'reports_export',
@@ -122,6 +150,12 @@ return [
             'permissions' => [
                 'company_view',
                 'fiscal_edit',
+                'clients_view',
+                'clients_create',
+                'clients_edit',
+                'items_view',
+                'items_create',
+                'items_edit',
                 'invoices_view',
                 'invoices_create',
                 'invoices_delete',
@@ -134,7 +168,7 @@ return [
             'name' => 'Employé',
             'slug' => 'employe',
             'description' => 'Accès restreint à la consultation des informations et documents.',
-            'permissions' => ['company_view', 'invoices_view', 'documents_view'],
+            'permissions' => ['company_view', 'clients_view', 'invoices_view', 'documents_view'],
             'is_system' => false,
         ],
     ],

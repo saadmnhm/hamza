@@ -3,7 +3,9 @@
 namespace App\Livewire\Documents\HR;
 
 use App\Livewire\Documents\DocumentType;
+use App\Models\Client;
 use App\Models\Config;
+use App\Models\Demande;
 use App\Models\DocumentHistory;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
@@ -62,7 +64,15 @@ class EmploymentContract extends Component
             $this->employer_name = $this->config->raison_sociale;
             $this->employer_address = $this->config->fullAddress();
         }
+
+        $clientId = request()->integer('client');
+
+        if ($clientId > 0 && Client::query()->whereKey($clientId)->exists()) {
+            $this->clientId = $clientId;
+        }
     }
+
+    public ?int $clientId = null;
 
     public $generatedHtml = null;
 
@@ -77,9 +87,20 @@ class EmploymentContract extends Component
         // Generate printable HTML document
         $html = $this->renderDocument($validated);
 
+        $demandeId = null;
+
+        if ($this->clientId !== null) {
+            $demandeId = Demande::query()->create([
+                'client_id' => $this->clientId,
+                'date' => now()->toDateString(),
+            ])->id;
+        }
+
         // Save to history
         $history = DocumentHistory::create([
             'user_id' => auth()->id(),
+            'client_id' => $this->clientId,
+            'demande_id' => $demandeId,
             'document_type' => DocumentType::EMPLOYMENT_CONTRACT->value,
             'title' => DocumentType::EMPLOYMENT_CONTRACT->title(),
             'data' => $validated,
@@ -118,6 +139,8 @@ class EmploymentContract extends Component
         // Save new history entry
         $newHistory = DocumentHistory::create([
             'user_id' => auth()->id(),
+            'client_id' => $history->client_id,
+            'demande_id' => $history->demande_id,
             'document_type' => DocumentType::EMPLOYMENT_CONTRACT->value,
             'title' => DocumentType::EMPLOYMENT_CONTRACT->title(),
             'data' => $history->data,

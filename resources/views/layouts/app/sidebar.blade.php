@@ -15,9 +15,21 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
+
+                    @if (auth()->user()?->hasPermission('documents_view') || auth()->user()?->hasPermission('clients_view'))
+                        <flux:sidebar.item icon="archive-box" :href="route('archive')" :current="request()->routeIs('archive*')" wire:navigate>
+                            {{ __('Archive') }}
+                        </flux:sidebar.item>
+                    @endif
                 </flux:sidebar.group>
             </flux:sidebar.nav>
             
+            @if (auth()->user()?->hasPermission('clients_view'))
+                <flux:sidebar.group expandable heading="{{ __('Clients') }}" class="grid">
+                    <flux:sidebar.item :href="route('clients.index')" :current="request()->routeIs('clients.*')">{{ __('Clients') }}</flux:sidebar.item>
+                </flux:sidebar.group>
+            @endif
+
             @if (auth()->user()?->hasPermission('documents_view'))
                 <flux:sidebar.group expandable heading="{{ __('Documents ') }}" class="grid">
                     <flux:sidebar.item :href="route('documents')" :current="request()->routeIs('documents')">{{ __('Génération de documents') }}</flux:sidebar.item>
