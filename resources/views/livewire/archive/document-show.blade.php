@@ -14,9 +14,9 @@
         <flux:card class="space-y-3">
             <flux:heading size="lg">Client</flux:heading>
             <div class="text-sm">
-                <div class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $document->client?->displayName() ?? '—' }}</div>
-                <div class="text-zinc-500">{{ $document->client?->fullAddress() ?: '—' }}</div>
-                <div class="text-zinc-500">{{ $document->client?->email ?: ($document->client?->phone ?: '—') }}</div>
+                <div class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $document->client?->displayName() ?? data_get($document->data, 'client.name') ?? '—' }}</div>
+                <div class="text-zinc-500">{{ $document->client?->fullAddress() ?: (data_get($document->data, 'client.address') ?: '—') }}</div>
+                <div class="text-zinc-500">{{ $document->client?->email ?: ($document->client?->phone ?: (data_get($document->data, 'client.email') ?: '—')) }}</div>
             </div>
         </flux:card>
 
@@ -40,9 +40,11 @@
     @if(false)
     <flux:card class="space-y-2">
         <flux:heading size="lg">Aperçu</flux:heading>
-        <div class="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 bg-zinc-50 dark:bg-zinc-800 overflow-auto max-h-96">
-            {!! $document->html !!}
-        </div>
+        <iframe
+            title="{{ $document->title }}"
+            class="w-full h-[600px] rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white"
+            srcdoc="{{ $document->html }}"
+        ></iframe>
     </flux:card>
     @endif
 </div>

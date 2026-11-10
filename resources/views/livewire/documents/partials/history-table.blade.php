@@ -22,7 +22,7 @@
                         <th class="py-2 pe-3">Client</th>
                     @endif
                     @if ($showInvoice)
-                        <th class="py-2 pe-3">Facture</th>
+                        <th class="py-2 pe-3">N° document</th>
                     @endif
                     <th class="py-2 text-end">Action</th>
                 </tr>
@@ -50,9 +50,17 @@
                             </td>
                         @endif
                         <td class="py-2 text-end">
-                            <flux:button variant="ghost" size="sm" icon="printer" :href="route('documents.print', $history)" target="_blank">
-                                Imprimer
-                            </flux:button>
+                            <div class="flex justify-end gap-1">
+                                @if ($history->public_token)
+                                    <flux:button variant="ghost" size="sm" icon="eye" :href="route('archive.documents.show', $history->public_token)" wire:navigate>
+                                        Voir
+                                    </flux:button>
+                                @endif
+
+                                <flux:button variant="ghost" size="sm" icon="printer" :href="route('documents.print', $history)" target="_blank">
+                                    Imprimer
+                                </flux:button>
+                            </div>
                         </td>
                     </tr>
                 @endforeach

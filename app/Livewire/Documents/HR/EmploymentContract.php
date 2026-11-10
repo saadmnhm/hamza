@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Config;
 use App\Models\Demande;
 use App\Models\DocumentHistory;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -84,8 +85,10 @@ class EmploymentContract extends Component
     {
         $validated = $this->validate();
 
+        $token = (string) Str::uuid();
+
         // Generate printable HTML document
-        $html = $this->renderDocument($validated);
+        $html = $this->renderDocument($validated, route('archive.documents.show', $token));
 
         $demandeId = null;
 
@@ -99,6 +102,7 @@ class EmploymentContract extends Component
         // Save to history
         $history = DocumentHistory::create([
             'user_id' => auth()->id(),
+            'public_token' => $token,
             'client_id' => $this->clientId,
             'demande_id' => $demandeId,
             'document_type' => DocumentType::EMPLOYMENT_CONTRACT->value,
@@ -134,11 +138,13 @@ class EmploymentContract extends Component
         $this->fill($history->data);
 
         // Generate new HTML
-        $html = $this->renderDocument($history->data);
+        $token = (string) Str::uuid();
+        $html = $this->renderDocument($history->data, route('archive.documents.show', $token));
 
         // Save new history entry
         $newHistory = DocumentHistory::create([
             'user_id' => auth()->id(),
+            'public_token' => $token,
             'client_id' => $history->client_id,
             'demande_id' => $history->demande_id,
             'document_type' => DocumentType::EMPLOYMENT_CONTRACT->value,
@@ -160,8 +166,12 @@ class EmploymentContract extends Component
         $this->generatedHtml = null;
     }
 
-    protected function renderDocument(array $data): string
+    protected function renderDocument(array $data, ?string $qrUrl = null): string
     {
+        if ($qrUrl !== null) {
+            $data['qr_url'] = $qrUrl;
+        }
+
         return view('livewire.documents.print.employmentcontract', [
             'data' => $data,
             'company' => $this->config,

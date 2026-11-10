@@ -25,6 +25,18 @@ class Archive extends Component
 
     public string $dateTo = '';
 
+    public function mount(): void
+    {
+        $user = auth()->user();
+
+        abort_unless(
+            $user?->hasPermission('documents_view')
+            || $user?->hasPermission('clients_view')
+            || $user?->hasPermission('invoices_view'),
+            403,
+        );
+    }
+
     public function setTab(string $tab): void
     {
         $this->tab = in_array($tab, ['documents', 'clients'], true) ? $tab : 'documents';
@@ -55,6 +67,7 @@ class Archive extends Component
     {
         if ($this->tab === 'clients') {
             $clients = Client::query()
+                ->withCount('documentHistories')
                 ->when($this->search !== '', function ($query): void {
                     $search = '%'.$this->search.'%';
 
@@ -87,7 +100,13 @@ class Archive extends Component
 
                 $query->where(function ($query) use ($search): void {
                     $query->where('title', 'like', $search)
-                        ->orWhere('document_type', 'like', $search);
+                        ->orWhere('document_type', 'like', $search)
+                        ->orWhereHas('client', function ($query) use ($search): void {
+                            $query->where('company_name', 'like', $search)
+                                ->orWhere('first_name', 'like', $search)
+                                ->orWhere('last_name', 'like', $search);
+                        })
+                        ->orWhereHas('invoice', fn ($query) => $query->where('number', 'like', $search));
                 });
             })
             ->when($this->dateFrom !== '', fn ($query) => $query->whereDate('created_at', '>=', $this->dateFrom))

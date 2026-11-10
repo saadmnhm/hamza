@@ -96,7 +96,7 @@ class InvoiceForm extends Component
         }
 
         if ($Demande !== null) {
-            $this->demande_id = $demande->id;
+            $this->demande_id = $Demande->id;
         } else {
             $demandeId = request()->integer('demande');
 
@@ -163,7 +163,7 @@ class InvoiceForm extends Component
 
         $invoice = $this->persist();
 
-        session()->flash('status', 'La facture '.$invoice->number.' a été enregistrée.');
+        session()->flash('status', 'Le document '.$invoice->number.' a été enregistré.');
 
         $this->redirectRoute('documents.show', ['invoice' => $invoice->id], navigate: true);
     }

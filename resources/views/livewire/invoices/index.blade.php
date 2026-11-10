@@ -7,7 +7,7 @@
         </div>
         <div class="flex items-center gap-3">
             @if (auth()->user()?->hasPermission('invoices_create'))
-                <flux:button variant="primary" icon="plus" :href="route('invoices.create')" wire:navigate>Nouvelle facture</flux:button>
+                <flux:button variant="primary" icon="plus" :href="route('clients.index')" wire:navigate>Choisir un client</flux:button>
             @endif
         </div>
     </div>
@@ -77,12 +77,12 @@
                             <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
 
                             <flux:menu>
-                                <flux:menu.item icon="eye" :href="route('invoices.show', $invoice)" wire:navigate>
+                                <flux:menu.item icon="eye" :href="route('documents.show', $invoice)" wire:navigate>
                                     Voir la facture
                                 </flux:menu.item>
 
                                 @if (auth()->user()?->hasPermission('invoices_create'))
-                                    <flux:menu.item icon="pencil-square" :href="route('invoices.edit', $invoice)" wire:navigate>
+                                    <flux:menu.item icon="pencil-square" :href="route('documents.edit', $invoice)" wire:navigate>
                                         Modifier
                                     </flux:menu.item>
                                 @endif

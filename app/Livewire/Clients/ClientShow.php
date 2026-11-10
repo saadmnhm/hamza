@@ -55,7 +55,7 @@ class ClientShow extends Component
     {
         $this->client->load([
             'invoices',
-            'Demandes' => fn ($query) => $query->with(['invoices', 'documentHistories'])->latest('date'),
+            'demandes' => fn ($query) => $query->with(['invoices', 'documentHistories'])->latest('date'),
             'documentHistories' => fn ($query) => $query->with('invoice')->latest(),
         ]);
 

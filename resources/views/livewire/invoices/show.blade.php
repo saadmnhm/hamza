@@ -4,7 +4,7 @@
         <div>
             <div class="flex flex-wrap items-center gap-3">
                 <flux:heading size="xl" level="1">{{ $invoice->number }}</flux:heading>
-                <flux:badge color="blue" size="sm">Facture</flux:badge>
+                <flux:badge color="blue" size="sm">{{ \App\Models\Invoice::LABELS[$invoice->type] ?? 'Document' }}</flux:badge>
             </div>
             <flux:subheading class="mt-1">
                 Émise le {{ $invoice->invoice_date?->format('d/m/Y') ?? '—' }}
@@ -30,7 +30,7 @@
                     variant="danger"
                     icon="trash"
                     wire:click="deleteInvoice"
-                    wire:confirm="Supprimer définitivement cette facture ?"
+                    wire:confirm="Supprimer définitivement ce document ?"
                 >
                     Supprimer
                 </flux:button>
@@ -136,7 +136,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-6 text-center text-sm text-zinc-500">Aucune ligne sur cette facture.</td>
+                            <td colspan="8" class="py-6 text-center text-sm text-zinc-500">Aucune ligne sur ce document.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -160,7 +160,7 @@
 
         @include('livewire.documents.partials.history-table', [
             'histories' => $invoice->documentHistories->sortByDesc('created_at'),
-            'emptyMessage' => 'Aucun document généré pour cette facture.',
+            'emptyMessage' => 'Aucun document généré pour ce document.',
         ])
     </flux:card>
 </div>

@@ -2,28 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
+     *
+     * The demo seeder creates the admin account (test@example.com / password),
+     * the company configuration, the article catalogue, a team of users and a
+     * large set of realistic clients, demandes, documents and HR records.
      */
     public function run(): void
     {
         $this->call(RoleSeeder::class);
-
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'role_id' => Role::query()->where('slug', 'admin')->value('id'),
-        ]);
+        $this->call(DemoDataSeeder::class);
     }
 }

@@ -98,7 +98,7 @@ class Invoice extends Model
      *
      * @return BelongsTo<Demande, $this>
      */
-    public function Demande(): BelongsTo
+    public function demande(): BelongsTo
     {
         return $this->belongsTo(Demande::class);
     }
@@ -217,6 +217,7 @@ class Invoice extends Model
         $token = (string) Str::uuid();
 
         $data = $this->toDocumentData();
+        $data['qr_url'] = route('archive.documents.show', $token);
 
         $html = view('livewire.documents.print.invoice', [
             'data' => $data,

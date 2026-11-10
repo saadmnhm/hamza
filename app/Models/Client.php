@@ -78,7 +78,7 @@ class Client extends Model
      *
      * @return HasMany<Demande, $this>
      */
-    public function Demandes(): HasMany
+    public function demandes(): HasMany
     {
         return $this->hasMany(Demande::class);
     }

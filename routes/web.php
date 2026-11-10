@@ -34,22 +34,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('utilisateur', Utilisateurs::class)->name('users');
     Route::get('roles/list', RolesList::class)->name('roleslist');
 
-    // Client management & documents
+    // Client management
     Route::get('clients', ClientsList::class)->name('clients.index');
     Route::get('clients/{client}', ClientShow::class)->name('clients.show');
-
-    // Document creation (product-based: invoice, delivery note, purchase order)
     Route::get('clients/{client}/documents/create', InvoiceForm::class)->name('clients.documents.create');
+
+    // Static document routes must be declared before documents/{invoice},
+    // otherwise /documents/facture would be captured as an invoice ID.
+    Route::get('documents', DocumentsList::class)->name('documents');
+    Route::get('documents/emploi-contrat', EmploymentContract::class)->name('documents.employment_contract');
+    Route::get('documents/fiche-paie', SalarySlip::class)->name('documents.salary_slip');
+    Route::get('documents/facture', Invoice::class)->name('documents.invoice');
+    Route::get('documents/print/{history}', [DocumentPrintController::class, 'print'])->name('documents.print');
+
+    // Product-based commercial documents (dynamic routes last).
     Route::get('documents/{invoice}', InvoiceShow::class)->name('documents.show');
     Route::get('documents/{invoice}/edit', InvoiceForm::class)->name('documents.edit');
-
-    // Document generation routes
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('documents', DocumentsList::class)->name('documents');
-        Route::get('documents/emploi-contrat', EmploymentContract::class)->name('documents.employment_contract');
-        Route::get('documents/fiche-paie', SalarySlip::class)->name('documents.salary_slip');
-        Route::get('documents/facture', Invoice::class)->name('documents.invoice');
-        Route::get('documents/print/{history}', [DocumentPrintController::class, 'print'])->name('documents.print');
-    });
 });
 require __DIR__.'/settings.php';

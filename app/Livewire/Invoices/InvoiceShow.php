@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Invoices;
 
+use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -34,11 +35,18 @@ class InvoiceShow extends Component
         $this->authorizeAction('invoices_delete');
 
         $number = $this->invoice->number;
+        $clientId = $this->invoice->client_id;
         $this->invoice->delete();
 
-        session()->flash('status', 'La facture '.$number.' a été supprimée.');
+        session()->flash('status', 'Le document '.$number.' a été supprimé.');
 
-        $this->redirectRoute('invoices.index', navigate: true);
+        if (Client::query()->whereKey($clientId)->exists()) {
+            $this->redirectRoute('clients.show', ['client' => $clientId], navigate: true);
+
+            return;
+        }
+
+        $this->redirectRoute('documents', navigate: true);
     }
 
     public function render(): View

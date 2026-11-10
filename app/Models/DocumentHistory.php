@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
+/**
+ * @property array<string, mixed> $data
+ * @property string $document_type
+ * @property string $title
+ * @property string|null $public_token
+ */
 class DocumentHistory extends Model
 {
     /** @use HasFactory<DocumentHistoryFactory> */
@@ -80,7 +86,7 @@ class DocumentHistory extends Model
      *
      * @return BelongsTo<Demande, $this>
      */
-    public function Demande(): BelongsTo
+    public function demande(): BelongsTo
     {
         return $this->belongsTo(Demande::class);
     }

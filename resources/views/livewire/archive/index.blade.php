@@ -104,7 +104,7 @@
                             <td class="py-2 pe-3 font-medium text-zinc-900 dark:text-zinc-100">{{ $client->displayName() }}</td>
                             <td class="py-2 pe-3 text-zinc-500 dark:text-zinc-400">{{ $client->isCompany() ? 'Entreprise' : 'Particulier' }}</td>
                             <td class="py-2 pe-3 text-zinc-500 dark:text-zinc-400">{{ $client->email ?: ($client->phone ?: '—') }}</td>
-                            <td class="py-2 pe-3 text-zinc-500 dark:text-zinc-400">{{ $client->documentHistories()->count() }}</td>
+                            <td class="py-2 pe-3 text-zinc-500 dark:text-zinc-400">{{ $client->document_histories_count }}</td>
                             <td class="py-2 pe-3">
                                 {!! \App\Support\QrCode::svg(route('archive.clients.show', $client->public_token), 48) !!}
                             </td>

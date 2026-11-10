@@ -97,15 +97,16 @@
         </div>
     </flux:card>
 
-    <!-- Factures -->
+    <!-- Documents commerciaux -->
     <flux:card class="space-y-4">
-        <flux:heading size="lg">Factures du client</flux:heading>
+        <flux:heading size="lg">Documents commerciaux du client</flux:heading>
 
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[700px] text-sm">
+            <table class="w-full min-w-[800px] text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-left text-xs uppercase tracking-wide text-zinc-500">
-                        <th class="py-2 pe-3">N° facture</th>
+                        <th class="py-2 pe-3">N° document</th>
+                        <th class="py-2 pe-3">Type</th>
                         <th class="py-2 pe-3">Date</th>
                         <th class="py-2 pe-3 text-end">Total TTC</th>
                         <th class="py-2 pe-3">Paiement</th>
@@ -116,6 +117,11 @@
                     @forelse ($client->invoices as $invoice)
                         <tr wire:key="client-invoice-{{ $invoice->id }}" class="border-b border-zinc-100 dark:border-zinc-800">
                             <td class="py-3 pe-3 font-medium text-zinc-900 dark:text-zinc-100">{{ $invoice->number }}</td>
+                            <td class="py-3 pe-3">
+                                <flux:badge color="zinc" size="sm">
+                                    {{ \App\Models\Invoice::LABELS[$invoice->type] ?? $invoice->type }}
+                                </flux:badge>
+                            </td>
                             <td class="py-3 pe-3 text-zinc-500 dark:text-zinc-400">{{ $invoice->invoice_date?->format('d/m/Y') ?? '—' }}</td>
                             <td class="py-3 pe-3 text-end tabular-nums">{{ number_format((float) $invoice->total, 2, ',', ' ') }} DH</td>
                             <td class="py-3 pe-3 text-zinc-500 dark:text-zinc-400">{{ $invoice->payment_terms ?: '—' }}</td>
@@ -127,7 +133,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-6 text-center text-sm text-zinc-500">Aucune facture pour ce client.</td>
+                            <td colspan="6" class="py-6 text-center text-sm text-zinc-500">Aucun document commercial pour ce client.</td>
                         </tr>
                     @endforelse
                 </tbody>

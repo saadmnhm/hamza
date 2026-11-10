@@ -160,5 +160,12 @@
                 <p>_________________________________</p>
                 <p style="font-size: 9pt;">Nom et signature de l'employeur</p>
             </div>
+
+            @if (! empty($data['qr_url']))
+                <div style="margin-top: 30px; text-align: center;">
+                    <p style="font-size: 9pt; color: #666; margin-bottom: 8px;">Scannez pour accéder à l'archive</p>
+                    {!! \App\Support\QrCode::svg($data['qr_url'], 90) !!}
+                </div>
+            @endif
         </body>
         </html>

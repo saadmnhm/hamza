@@ -23,7 +23,7 @@
         <flux:callout variant="warning" icon="exclamation-triangle">
             <flux:callout.heading>Aucun client enregistré</flux:callout.heading>
             <flux:callout.text>
-                Créez d'abord une fiche client avant d'émettre une facture.
+                Créez d'abord une fiche client avant de créer un document.
                 <flux:link :href="route('clients.index')" wire:navigate>Gérer les clients</flux:link>
             </flux:callout.text>
         </flux:callout>
@@ -36,14 +36,14 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 <flux:field>
-                    <flux:label>N° de facture</flux:label>
+                    <flux:label>N° de document</flux:label>
                     <flux:input wire:model="number" readonly />
                     <flux:description>Généré automatiquement.</flux:description>
                     <flux:error name="number" />
                 </flux:field>
 
                 <flux:field>
-                    <flux:label required>Date de facture</flux:label>
+                    <flux:label required>Date du document</flux:label>
                     <flux:input type="date" wire:model="invoice_date" required />
                     <flux:error name="invoice_date" />
                 </flux:field>
@@ -235,7 +235,7 @@
         <div class="flex flex-wrap justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
             <flux:button variant="ghost" :href="route('clients.index')" wire:navigate>Annuler</flux:button>
             <flux:button type="submit" variant="primary" icon="check">
-                {{ $invoiceId ? 'Enregistrer les modifications' : 'Enregistrer la facture' }}
+                {{ $invoiceId ? 'Enregistrer les modifications' : 'Enregistrer le document' }}
             </flux:button>
             <flux:button type="button" variant="filled" icon="printer" wire:click="saveAndPrint">
                 Enregistrer et imprimer

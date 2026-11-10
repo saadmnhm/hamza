@@ -14,6 +14,15 @@ class DocumentShow extends Component
 
     public function mount(string $token): void
     {
+        $user = auth()->user();
+
+        abort_unless(
+            $user?->hasPermission('documents_view')
+            || $user?->hasPermission('clients_view')
+            || $user?->hasPermission('invoices_view'),
+            403,
+        );
+
         $this->document = DocumentHistory::query()
             ->where('public_token', $token)
             ->firstOrFail();

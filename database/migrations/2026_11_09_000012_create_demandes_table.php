@@ -38,13 +38,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('document_histories', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('Demande_id');
+            $table->dropConstrainedForeignId('demande_id');
         });
 
         Schema::table('invoices', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('Demande_id');
+            $table->dropConstrainedForeignId('demande_id');
         });
 
-        Schema::dropIfExists('Demandes');
+        Schema::dropIfExists('demandes');
     }
 };
