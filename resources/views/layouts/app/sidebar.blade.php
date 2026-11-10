@@ -36,6 +36,12 @@
                 </flux:sidebar.group>
             @endif
 
+            @if (auth()->user()?->hasPermission('documents_view') || auth()->user()?->hasPermission('clients_view'))
+                <flux:sidebar.group expandable heading="{{ __('QR Codes ') }}" class="grid">
+                    <flux:sidebar.item :href="route('qr-groups.index')" :current="request()->routeIs('qr-groups.*')">{{ __('Groupes QR') }}</flux:sidebar.item>
+                </flux:sidebar.group>
+            @endif
+
             @if (auth()->user()?->hasPermission('users_view') || auth()->user()?->hasPermission('roles_manage'))
                 <flux:sidebar.group expandable heading="{{ __('Utilisateur ') }}" class="grid">
                     @if (auth()->user()?->hasPermission('users_view'))

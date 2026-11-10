@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DocumentPrintController;
+use App\Http\Controllers\QrGroupPrintController;
+use App\Http\Controllers\QrLabelPrintController;
 use App\Livewire\Archive\Archive;
 use App\Livewire\Archive\ClientShow as ArchiveClientShow;
 use App\Livewire\Archive\DocumentShow as ArchiveDocumentShow;
@@ -14,6 +16,8 @@ use App\Livewire\Documents\HR\EmploymentContract;
 use App\Livewire\Documents\HR\SalarySlip;
 use App\Livewire\Invoices\InvoiceForm;
 use App\Livewire\Invoices\InvoiceShow;
+use App\Livewire\QrGroups\QrGroups;
+use App\Livewire\QrGroups\QrGroupShow;
 use App\Livewire\Roles\RolesList;
 use App\Livewire\Utilisateurs\Utilisateurs;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +28,8 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('archive', Archive::class)->name('archive');
+    Route::get('archive/documents/{token}/qr', [QrLabelPrintController::class, 'document'])->name('archive.documents.qr');
+    Route::get('archive/clients/{token}/qr', [QrLabelPrintController::class, 'client'])->name('archive.clients.qr');
     Route::get('archive/documents/{token}', ArchiveDocumentShow::class)->name('archive.documents.show');
     Route::get('archive/clients/{token}', ArchiveClientShow::class)->name('archive.clients.show');
 });
@@ -33,6 +39,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('configs', Config::class)->name('config');
     Route::get('utilisateur', Utilisateurs::class)->name('users');
     Route::get('roles/list', RolesList::class)->name('roleslist');
+
+    // QR code groups: select clients/documents, store the selection and print QR labels.
+    Route::get('qr-groups', QrGroups::class)->name('qr-groups.index');
+    Route::get('qr-groups/{token}/print', [QrGroupPrintController::class, 'print'])->name('qr-groups.print');
+    Route::get('qr-groups/{token}', QrGroupShow::class)->name('qr-groups.show');
 
     // Client management
     Route::get('clients', ClientsList::class)->name('clients.index');

@@ -9,6 +9,8 @@ use App\Models\Demande;
 use App\Models\DocumentHistory;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\QrGroup;
+use App\Models\QrGroupItem;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -141,6 +143,68 @@ class DemoDataSeeder extends Seeder
 
         $this->seedCommercialActivity($clients, $items, $admin);
         $this->seedHumanResources($clients, $config, $admin);
+        $this->seedQrGroups($admin);
+    }
+
+    /**
+     * Seed a ready-to-print QR group so the module has demo content.
+     */
+    private function seedQrGroups(User $admin): void
+    {
+        if (QrGroup::query()->exists()) {
+            return;
+        }
+
+        $documents = DocumentHistory::query()
+            ->with(['client', 'invoice'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $clients = Client::query()->latest()->take(4)->get();
+
+        if ($documents->isEmpty() && $clients->isEmpty()) {
+            return;
+        }
+
+        $group = QrGroup::query()->create([
+            'user_id' => $admin->id,
+            'name' => 'Lots de démonstration',
+            'description' => 'Sélection de clients et de documents avec QR codes imprimables.',
+        ]);
+
+        foreach ($documents as $document) {
+            $group->items()->create([
+                'item_type' => QrGroupItem::TYPE_DOCUMENT,
+                'item_id' => $document->id,
+                'public_token' => $document->public_token,
+                'label' => $document->title,
+                'meta' => [
+                    'document_type' => $document->document_type,
+                    'type_label' => DocumentType::tryFrom($document->document_type)?->title(),
+                    'number' => data_get($document, 'invoice.number') ?? data_get($document->data, 'invoice_number'),
+                    'client' => $document->client?->displayName() ?? data_get($document->data, 'client.name'),
+                    'total' => data_get($document->data, 'total'),
+                    'date' => $document->created_at?->format('d/m/Y'),
+                ],
+            ]);
+        }
+
+        foreach ($clients as $client) {
+            $group->items()->create([
+                'item_type' => QrGroupItem::TYPE_CLIENT,
+                'item_id' => $client->id,
+                'public_token' => $client->public_token,
+                'label' => $client->displayName(),
+                'meta' => [
+                    'client_type' => $client->type,
+                    'type_label' => $client->isCompany() ? 'Entreprise' : 'Particulier',
+                    'email' => $client->email,
+                    'phone' => $client->phone,
+                    'city' => $client->city,
+                ],
+            ]);
+        }
     }
 
     private function seedAdmin(): User

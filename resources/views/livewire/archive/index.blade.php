@@ -60,6 +60,7 @@
                             <td class="py-2 text-end">
                                 <div class="flex justify-end gap-1">
                                     <flux:button variant="ghost" size="sm" icon="printer" :href="route('documents.print', $history)" target="_blank">Imprimer</flux:button>
+                                    <flux:button variant="ghost" size="sm" icon="qr-code" :href="route('archive.documents.qr', $history->public_token)" target="_blank">QR</flux:button>
                                     <flux:button variant="ghost" size="sm" icon="eye" :href="route('archive.documents.show', $history->public_token)" wire:navigate>Voir</flux:button>
                                 </div>
                             </td>
@@ -109,7 +110,10 @@
                                 {!! \App\Support\QrCode::svg(route('archive.clients.show', $client->public_token), 48) !!}
                             </td>
                             <td class="py-2 text-end">
-                                <flux:button variant="ghost" size="sm" icon="eye" :href="route('archive.clients.show', $client->public_token)" wire:navigate>Voir</flux:button>
+                                <div class="flex justify-end gap-1">
+                                    <flux:button variant="ghost" size="sm" icon="qr-code" :href="route('archive.clients.qr', $client->public_token)" target="_blank">QR</flux:button>
+                                    <flux:button variant="ghost" size="sm" icon="eye" :href="route('archive.clients.show', $client->public_token)" wire:navigate>Voir</flux:button>
+                                </div>
                             </td>
                         </tr>
                     @empty

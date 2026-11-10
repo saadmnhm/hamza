@@ -25,6 +25,9 @@
             <div class="flex justify-center">
                 {!! \App\Support\QrCode::svg(route('archive.documents.show', $document->public_token), 160) !!}
             </div>
+            <flux:button variant="primary" icon="printer" class="w-full" :href="route('archive.documents.qr', $document->public_token)" target="_blank">
+                Imprimer le QR
+            </flux:button>
         </flux:card>
     </div>
 

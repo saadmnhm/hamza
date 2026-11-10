@@ -49,6 +49,14 @@
             'permission' => 'documents_view',
         ],
         [
+            'title' => 'QR Codes',
+            'description' => 'Regroupez clients et documents puis imprimez tous leurs QR codes.',
+            'route' => 'qr-groups.index',
+            'icon' => 'qr-code',
+            'tone' => 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400',
+            'permission' => 'documents_view',
+        ],
+        [
             'title' => 'Mon profil',
             'description' => 'Nom, e-mail et sécurité de votre compte.',
             'route' => 'profile.edit',
