@@ -19,7 +19,7 @@ test('authenticated users can visit the dashboard', function () {
     $response->assertOk();
 });
 
-test('dashboard displays statistics and shortcuts', function () {
+test('dashboard displays statistics, charts and shortcuts', function () {
     $adminRole = Role::query()->where('slug', 'admin')->firstOrFail();
     $user = User::factory()->create([
         'name' => 'Admin Test',
@@ -39,16 +39,45 @@ test('dashboard displays statistics and shortcuts', function () {
 
     $dashboard = Livewire::actingAs($user)->test(Dashboard::class);
 
-    $stats = $dashboard->viewData('stats');
+    /** @var array<string, array{label: string, value: int|string, hint: string, icon: string}> $stats */
+    $stats = collect($dashboard->viewData('stats'))->keyBy('label')->all();
 
-    expect($stats)->toHaveCount(4)
-        ->and($stats[0]['value'])->toBe(2)
-        ->and($stats[1]['value'])->toBe(1)
-        ->and($stats[2]['value'])->toBe(1)
-        ->and($stats[3]['value'])->toBe('Configurée');
+    expect($stats)->toHaveKeys([
+        "Chiffre d'affaires",
+        'Factures émises',
+        'Clients',
+        'Documents archivés',
+        'Demandes',
+        'Articles',
+        'Utilisateurs',
+        'Comptes vérifiés',
+        'En attente',
+        'Fiche entreprise',
+    ])
+        ->and($stats["Chiffre d'affaires"]['value'])->toBe('0,00 DH')
+        ->and($stats['Factures émises']['value'])->toBe(0)
+        ->and($stats['Clients']['value'])->toBe(0)
+        ->and($stats['Documents archivés']['value'])->toBe(0)
+        ->and($stats['Utilisateurs']['value'])->toBe(2)
+        ->and($stats['Comptes vérifiés']['value'])->toBe(1)
+        ->and($stats['En attente']['value'])->toBe(1)
+        ->and($stats['Fiche entreprise']['value'])->toBe('Configurée')
+        ->and($stats['Fiche entreprise']['hint'])->toBe('Société Exemple');
+
+    expect($dashboard->viewData('revenueChart'))->toHaveCount(12)
+        ->and($dashboard->viewData('documentTypeChart'))->toHaveCount(5)
+        ->and($dashboard->viewData('documentTypeTotal'))->toBe(0)
+        ->and($dashboard->viewData('clientTypeChart'))->toBe([
+            'companies' => 0,
+            'individuals' => 0,
+        ]);
 
     $dashboard
         ->assertSee('Tableau de bord')
+        ->assertSee("Chiffre d'affaires")
+        ->assertSee('Factures TTC sur les 12 derniers mois')
+        ->assertSee('Répartition par type de document')
+        ->assertSee('Répartition entreprises / particuliers')
         ->assertSee('Configuration entreprise')
         ->assertSee('Société Exemple')
         ->assertSee('Admin Test');
